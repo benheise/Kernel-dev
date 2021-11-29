@@ -11,7 +11,6 @@ int main()
 	HANDLE hFile = INVALID_HANDLE_VALUE;
 	BOOL result = FALSE;
 	DWORD lpBytesReturned = 0;
-	CHAR outputBuffer[128] = { 0 };
 	CHAR inputBuffer[128] = "This is data being sent to the kernel";
 
 	hFile = CreateFileA(DRIVER_PATH, GENERIC_ALL, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_SYSTEM, 0);
