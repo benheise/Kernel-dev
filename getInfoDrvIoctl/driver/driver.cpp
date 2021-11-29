@@ -2,6 +2,7 @@
 #include <wdm.h>
 
 #define INFO_IOCTL CTL_CODE(FILE_DEVICE_UNKNOWN, 0x1337, METHOD_BUFFERED, FILE_ANY_ACCESS)
+#define STRING_IOCTL CTL_CODE(FILE_DEVICE_UNKNOWN, 0x1338, METHOD_BUFFERED, FILE_ANY_ACCESS)
 
 UNICODE_STRING SYM_NAME = RTL_CONSTANT_STRING(L"\\Device\\InfoDevice");
 UNICODE_STRING DEV_NAME = RTL_CONSTANT_STRING(L"\\??\\InfoDevice");
@@ -18,10 +19,9 @@ VOID DriverUnload(PDRIVER_OBJECT DriverObject)
 NTSTATUS HandleIoctls(PDEVICE_OBJECT DeviceObject, PIRP Irp)
 {
 
-    UNREFERENCED_PARAMETER(DeviceObject);
-
     PIO_STACK_LOCATION stack_location = NULL;
     NTSTATUS status = STATUS_SUCCESS;
+    CHAR* outputString = "This is sent from kernel-mode";
 
     stack_location = IoGetCurrentIrpStackLocation(Irp);
 
@@ -34,13 +34,17 @@ NTSTATUS HandleIoctls(PDEVICE_OBJECT DeviceObject, PIRP Irp)
 
         if (stack_location->Parameters.DeviceIoControl.IoControlCode == INFO_IOCTL)
         {
-            DbgPrintEx(DPFLTR_IHVDRIVER_ID, DPFLTR_ERROR_LEVEL, "Hit IOCTL call", 0);
-
             DbgPrintEx(DPFLTR_IHVDRIVER_ID, DPFLTR_ERROR_LEVEL, "DriverStart: 0x%p", DeviceObject->DriverObject->DriverStart);
             DbgPrintEx(DPFLTR_IHVDRIVER_ID, DPFLTR_ERROR_LEVEL, "DriverSize: 0x%d", DeviceObject->DriverObject->DriverSize);
             DbgPrintEx(DPFLTR_IHVDRIVER_ID, DPFLTR_ERROR_LEVEL, "DriverSection: 0x%p", DeviceObject->DriverObject->DriverSection);
+        }   
+        if (stack_location->Parameters.DeviceIoControl.IoControlCode == STRING_IOCTL)
+        {
+            DbgPrintEx(DPFLTR_IHVDRIVER_ID, DPFLTR_ERROR_LEVEL, "Sending kernel string back %s", outputString);
+            RtlCopyMemory(Irp->AssociatedIrp.SystemBuffer, outputString, sizeof(outputString));
+            status = STATUS_SUCCESS;
         }
-
+      
     case IRP_MJ_CREATE:
 
         DbgPrintEx(DPFLTR_IHVDRIVER_ID, DPFLTR_ERROR_LEVEL, "Handle to the symolic link was created", 0);
@@ -59,12 +63,12 @@ NTSTATUS HandleIoctls(PDEVICE_OBJECT DeviceObject, PIRP Irp)
 
     Irp->IoStatus.Information = 0;
     Irp->IoStatus.Status = STATUS_SUCCESS;
+
     IoCompleteRequest(Irp, IO_NO_INCREMENT);
 
     return status;
 }
 
-extern "C"
 NTSTATUS DriverEntry(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath)
 {
     NTSTATUS status = 0;
