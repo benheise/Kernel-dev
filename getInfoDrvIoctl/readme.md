@@ -3,7 +3,9 @@
 1. Set up the `Computer\HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Debug Print Filter` Registry key
 2. Use `DbgPrintEx` to have debug statements appear in DebugView
 
-![image](https://user-images.githubusercontent.com/54753063/143796998-62facd88-6325-4728-b8d0-cc717121de55.png)
+After loading the driver and executing the client, the `INFO_IOCTL` IOCTL will cause the driver to print information such as the drivers base address.
+
+![image](https://user-images.githubusercontent.com/54753063/143798850-ff69af63-2a2e-4e88-8eda-3aa782151d9f.png)
 
 ### InfoDevice.sys
 
@@ -12,6 +14,7 @@
 3. Accepts a `IRP_MJ_DEVICE_CONTROL` request from user-mode
 4. Checks the inbound IOCTL code
 5. Prints information about the driver based on the correct IOCTL code
+
 
 ### InfoDevice_client.exe
 
