@@ -9,7 +9,7 @@ DRIVER_DISPATCH HandleIoctls;
 
 VOID DriverUnload(PDRIVER_OBJECT DriverObject)
 {
-    KdPrint(("Driver has been unloaded\n"));
+    DbgPrintEx(DPFLTR_IHVDRIVER_ID, DPFLTR_ERROR_LEVEL, "Driver has been unloaded", 0);
 
     IoDeleteDevice(DriverObject->DeviceObject);
     IoDeleteSymbolicLink(&SYM_NAME);
@@ -29,11 +29,16 @@ NTSTATUS HandleIoctls(PDEVICE_OBJECT DeviceObject, PIRP Irp)
     {
     case IRP_MJ_DEVICE_CONTROL:
 
+      
         DbgPrintEx(DPFLTR_IHVDRIVER_ID, DPFLTR_ERROR_LEVEL, "IOCTL was recieved in kernel-mode", 0);
 
         if (stack_location->Parameters.DeviceIoControl.IoControlCode == INFO_IOCTL)
         {
             DbgPrintEx(DPFLTR_IHVDRIVER_ID, DPFLTR_ERROR_LEVEL, "Hit IOCTL call", 0);
+
+            DbgPrintEx(DPFLTR_IHVDRIVER_ID, DPFLTR_ERROR_LEVEL, "DriverStart: 0x%p", DeviceObject->DriverObject->DriverStart);
+            DbgPrintEx(DPFLTR_IHVDRIVER_ID, DPFLTR_ERROR_LEVEL, "DriverSize: 0x%d", DeviceObject->DriverObject->DriverSize);
+            DbgPrintEx(DPFLTR_IHVDRIVER_ID, DPFLTR_ERROR_LEVEL, "DriverSection: 0x%p", DeviceObject->DriverObject->DriverSection);
         }
 
     case IRP_MJ_CREATE:
