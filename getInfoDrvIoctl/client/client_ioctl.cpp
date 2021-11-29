@@ -35,7 +35,7 @@ int main()
 	} 
 	if (user_selection == "STRING_IOCTL")
 	{
-		result = DeviceIoControl(hFile, STRING_IOCTL, inputBuffer, sizeof(inputBuffer), outputBuffer, sizeof(outputBuffer), &lpBytesReturned, (LPOVERLAPPED)NULL);
+		result = DeviceIoControl(hFile, STRING_IOCTL, inputBuffer, sizeof(inputBuffer), NULL, 0, &lpBytesReturned, NULL);
 		
 		if (outputBuffer != NULL)
 		{
