@@ -21,8 +21,7 @@ NTSTATUS HandleIoctls(PDEVICE_OBJECT DeviceObject, PIRP Irp)
 
     PIO_STACK_LOCATION stack_location = NULL;
     NTSTATUS status = STATUS_SUCCESS;
-    CHAR* outputString = "This is sent from kernel-mode";
-
+    
     stack_location = IoGetCurrentIrpStackLocation(Irp);
 
     switch (stack_location->MajorFunction)
@@ -40,8 +39,9 @@ NTSTATUS HandleIoctls(PDEVICE_OBJECT DeviceObject, PIRP Irp)
         }   
         if (stack_location->Parameters.DeviceIoControl.IoControlCode == STRING_IOCTL)
         {
-            DbgPrintEx(DPFLTR_IHVDRIVER_ID, DPFLTR_ERROR_LEVEL, "Sending kernel string back %s", outputString);
-            RtlCopyMemory(Irp->AssociatedIrp.SystemBuffer, outputString, sizeof(outputString));
+            // debug print the string sent from usermode
+            DbgPrintEx(DPFLTR_IHVDRIVER_ID, DPFLTR_ERROR_LEVEL, (char*)Irp->AssociatedIrp.SystemBuffer);
+
             status = STATUS_SUCCESS;
         }
       
